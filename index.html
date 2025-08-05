@@ -3,265 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Gestión de Productos - Miguel Fajardo</title>
     <style>
-        /* Reset CSS */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        html { font-size: 90%; }
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #fff;
-            color: #333;
-            padding: 0 20px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f7fafd;
+            color: #222;
+            padding: 0 6px;
+            font-size: 13.5px;
         }
-
         header {
-            background-color: #000;
-            color: white;
-            padding: 15px 0;
+            background: linear-gradient(90deg,#222,#3a3a3a);
+            color: #fff;
+            padding: 8px 0;
             text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-container {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        input[type="text"] {
-            padding: 12px;
-            margin: 10px 0;
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid #ccc;
+            font-size: 19.8px;
+            font-weight: 600;
             border-radius: 5px;
-            font-size: 16px;
-            transition: border 0.3s;
+            margin: 14px 0 10px 0;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 6px #0001;
         }
-
-        input[type="text"]:focus {
-            border-color: #000;
-            outline: none;
+        .container {
+            max-width: 630px;
+            margin: 14px auto;
+            padding: 12px;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 1px 8px #0001;
         }
-
+        .search-container {
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .search-container h2 {
+            font-size: 15.3px;
+            margin-bottom: 4px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        input[type="text"] {
+            padding: 6px;
+            margin: 4px 0;
+            width: 88%;
+            max-width: 300px;
+            border: 1px solid #bfc9d1;
+            border-radius: 3px;
+            font-size: 13.5px;
+            transition: border 0.2s;
+            background: #f9fbfc;
+        }
+        input[type="text"]:focus { border-color: #5dade2; background: #f4faff; }
         .search-results {
-            font-size: 16px;
-            margin: 10px 0;
-            font-weight: bold;
-            color: #333;
+            font-size: 12.6px;
+            margin: 4px 0;
+            color: #4a4a4a;
         }
-
-        .product-list {
-            margin-top: 20px;
-            width: 100%;
-            overflow-x: auto;
-        }
-
+        .product-list { margin-top: 7px; width: 100%; overflow-x: auto; }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 7px;
+            font-size: 12.6px;
+            background: #fcfdff;
         }
-
         th, td {
-            padding: 12px;
+            padding: 5px 4px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
-            font-size: 16px;
+            border-bottom: 1px solid #e3e8ee;
         }
-
         th {
-            background-color: #000;
-            color: white;
+            background: #5dade2;
+            color: #fff;
+            font-size: 12.6px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
         }
-
-        td {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover td {
-            background-color: #f1f1f1;
-        }
-
+        td { background: #f7fafd; }
+        tr:hover td { background: #e3f1fa; }
         .footer {
             text-align: center;
-            font-size: 14px;
-            color: #555;
-            margin-top: 50px;
+            font-size: 11.7px;
+            color: #9ca3af;
+            margin-top: 22px;
         }
-
-        .notification {
-            background-color: #2ecc71;
-            color: white;
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 5px;
+        .notification, .loading {
+            padding: 6px;
+            margin-top: 8px;
+            border-radius: 3px;
             display: none;
-        }
-
-        .notification.error {
-            background-color: #e74c3c;
-        }
-
-        .notification.warning {
-            background-color: #f1c40f;
-        }
-
-        .loading {
-            background-color: #f39c12;
-            color: white;
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 5px;
-            display: none;
-        }
-
-        .file-input-container {
-            margin: 20px 0;
+            font-size: 12.6px;
             text-align: center;
         }
-
+        .notification { background: #43a047; color: #fff; }
+        .notification.error { background: #e53935; }
+        .notification.warning { background: #fbc02d; color: #222; }
+        .loading { background: #5dade2; color: #fff; }
+        .file-input-container {
+            margin: 8px 0;
+            text-align: center;
+        }
         .file-input-container label {
             display: inline-block;
-            padding: 10px 20px;
-            background-color: #000;
-            color: white;
-            border-radius: 5px;
+            padding: 5px 12px;
+            background: #5dade2;
+            color: #fff;
+            border-radius: 3px;
             cursor: pointer;
+            font-size: 12.6px;
+            transition: background 0.2s;
+            font-weight: 500;
         }
-
-        .file-input-container input[type="file"] {
-            display: none;
-        }
-
+        .file-input-container label:hover { background: #2980b9; }
+        .file-input-container input[type="file"] { display: none; }
         .temp-list-container {
-            margin-top: 40px;
-            border-top: 2px solid #000;
-            padding-top: 20px;
+            margin-top: 18px;
+            border-top: 1.5px solid #5dade2;
+            padding-top: 8px;
         }
-
         .temp-list-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 7px;
         }
-
-        .temp-list-table th {
-            background-color: #666;
-        }
-
+        .temp-list-header h2 { font-size: 14.4px; font-weight: 500; }
+        .temp-list-table th { background: #2980b9; }
         .quantity-input {
-            width: 70px;
-            padding: 5px;
+            width: 38px;
+            padding: 2px;
             text-align: center;
+            font-size: 12.6px;
+            border-radius: 2px;
+            border: 1px solid #bfc9d1;
         }
-
-        .btn-remove {
-            background-color: #e74c3c;
-            color: white;
+        .btn-remove, .btn-add, .btn-clear, .btn-download {
             border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
+            border-radius: 2px;
             cursor: pointer;
+            font-size: 11.7px;
+            padding: 4px 9px;
+            margin: 0 1px;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 2px #0001;
         }
-
-        .btn-clear {
-            background-color: #000;
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .btn-add {
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        .btn-download {
-            background-color: #3498db;
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-
+        .btn-remove { background: #e74c3c; color: #fff; }
+        .btn-remove:hover { background: #c0392b; }
+        .btn-add { background: #43a047; color: #fff; }
+        .btn-add:hover { background: #2e7031; }
+        .btn-clear { background: #b0b0b0; color: #fff; }
+        .btn-clear:hover { background: #888; }
+        .btn-download { background: #5dade2; color: #fff; margin-left: 4px; }
+        .btn-download:hover { background: #2980b9; }
         .sr-only {
             position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            border: 0;
+            width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); border: 0;
         }
-
-        /* Responsividad */
-        @media (max-width: 768px) {
-            .container {
-                width: 100%;
-                padding: 15px;
-            }
-
-            input[type="text"] {
-                max-width: 100%;
-            }
-
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
+        .success-spinner-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(44, 62, 80, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            pointer-events: none;
+            animation: fadeIn 0.5s;
+        }
+        .success-spinner-box {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px #0001;
+            padding: 18px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: auto;
+        }
+        .success-spinner-box span.emoji {
+            font-size: 36px;
+            margin-bottom: 4px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 600px) {
+            .container { width: 100%; padding: 4px; }
+            input[type="text"] { max-width: 100%; }
+            table { font-size: 11px; }
+            .temp-list-header { flex-direction: column; gap: 4px; }
         }
     </style>
 </head>
 <body>
-
-<header>
-    Gestión de Productos
-</header>
-
+<header>Gestión de Productos</header>
 <div class="container">
-
     <div class="search-container">
         <h2>Buscar Productos</h2>
         <label for="searchQuery" class="sr-only">Buscar productos</label>
-        <input type="text" id="searchQuery" placeholder="Buscar por Código o Descripción">
+        <input type="text" id="searchQuery" placeholder="Buscar por Código o Descripción" autocomplete="off">
+        <div class="search-results" id="searchResults"></div>
     </div>
-
     <div class="file-input-container">
         <label for="excelFile">Cargar archivo Excel</label>
         <input type="file" id="excelFile" accept=".xlsx, .xls">
     </div>
-
-    <div class="search-results" id="searchResults"></div>
-
     <div class="product-list">
         <table id="productTable">
             <thead>
@@ -269,22 +223,20 @@
                     <th>Código</th>
                     <th>Descripción</th>
                     <th>Precio IDI</th>
-                    <th>Acciones</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Los productos se cargarán dinámicamente desde el archivo Excel -->
+                <!-- Productos dinámicos -->
             </tbody>
         </table>
     </div>
-
-    <!-- Lista temporal de productos -->
     <div class="temp-list-container">
         <div class="temp-list-header">
-            <h2>Lista Temporal de Productos</h2>
+            <h2>Lista Temporal</h2>
             <div>
-                <button class="btn-clear" onclick="clearTempList()">Limpiar Lista</button>
-                <button class="btn-download" onclick="downloadTempList()">Descargar Lista</button>
+                <button class="btn-clear" onclick="clearTempList()">Limpiar</button>
+                <button class="btn-download" onclick="downloadTempList()">Descargar</button>
             </div>
         </div>
         <table class="temp-list-table">
@@ -294,7 +246,7 @@
                     <th>Descripción</th>
                     <th>Cantidad</th>
                     <th>Precio IDI</th>
-                    <th>Acciones</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody id="tempListBody">
@@ -302,17 +254,14 @@
             </tbody>
         </table>
     </div>
-
-    <!-- Notificaciones -->
     <div class="loading" id="loadingNotification">Cargando datos...</div>
     <div class="notification" id="notification">Datos cargados correctamente.</div>
-
+    <!-- Reemplaza el div del spinner -->
+    <div id="successSpinner" style="display:none;"></div>
 </div>
-
 <div class="footer">
     <p>Creado por Miguel Fajardo - Analista de Inventarios</p>
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
 <script>
     const searchQuery = document.getElementById('searchQuery');
@@ -322,21 +271,44 @@
     const loadingNotification = document.getElementById('loadingNotification');
     const excelFileInput = document.getElementById('excelFile');
     const tempListBody = document.getElementById('tempListBody');
+    const successSpinner = document.getElementById('successSpinner');
 
     let products = [];
     let selectedProducts = [];
 
-    // Función para mostrar notificaciones
     function showNotification(message, type = 'success') {
         notification.textContent = message;
         notification.className = `notification ${type}`;
         notification.style.display = 'block';
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 3000);
+        if (type === 'success') {
+            notification.style.background = '#43a047';
+            notification.style.color = '#fff';
+        } else if (type === 'error') {
+            notification.style.background = '#e53935';
+            notification.style.color = '#fff';
+        } else if (type === 'warning') {
+            notification.style.background = '#fbc02d';
+            notification.style.color = '#222';
+        }
+        setTimeout(() => { notification.style.display = 'none'; }, 2200);
     }
 
-    // Función para cargar datos desde un archivo Excel (modificada)
+    function showSuccessSpinner(count) {
+        successSpinner.innerHTML = `
+            <div class="success-spinner-overlay">
+                <div class="success-spinner-box">
+                    <span class="emoji">✅</span>
+                    <span>Archivo importado con éxito</span>
+                    <span style="font-size:17px;">${count} productos cargados.</span>
+                </div>
+            </div>
+        `;
+        successSpinner.style.display = 'block';
+        // Oculta el input de archivo
+        document.querySelector('.file-input-container').style.display = 'none';
+        setTimeout(() => { successSpinner.style.display = 'none'; }, 3500);
+    }
+
     function loadExcelFile(event) {
         const file = event.target.files[0];
         if (file) {
@@ -349,26 +321,22 @@
                     const sheetName = workbook.SheetNames[0];
                     const sheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(sheet);
-
-                    // Validar estructura del archivo (nuevas columnas)
                     if (!jsonData[0]?.hasOwnProperty('Idproducto')) {
-                        throw new Error('Formato de columnas incorrecto. Debe contener al menos Idproducto');
+                        throw new Error('Formato incorrecto. Falta columna Idproducto.');
                     }
-
-                    // Procesar los datos con nuevo formato
                     products = jsonData.map(item => ({
                         code: String(item['Idproducto'] || ''),
                         description: String(item['Descripcion'] || ''),
                         idmedida: String(item['Idmedida'] || ''),
                         idproducto_agritask: String(item['Idproducto_agritask'] || ''),
                         precio_IDI: Number(item['Precio_IDI']) || 0,
-                        // Columnas adicionales que pueden usarse en el futuro
                         precio_Venta: Number(item['Precio_Venta']) || 0,
                         precio_Compra: Number(item['Precio_Compra']) || 0
                     }));
-
-                    displayProducts(products);
-                    showNotification('Datos cargados correctamente.');
+                    // Mostrar solo los primeros 10 productos al cargar
+                    displayProducts(products.slice(0, 10));
+                    searchResults.textContent = 'Mostrando los primeros 10 productos. Use la búsqueda para filtrar.';
+                    showSuccessSpinner(products.length);
                 } catch (error) {
                     showNotification(`Error: ${error.message}`, 'error');
                 } finally {
@@ -379,23 +347,33 @@
         }
     }
 
-    // Función para mostrar productos en la tabla principal
     function displayProducts(productsToDisplay) {
         productTable.innerHTML = '';
         productsToDisplay.forEach(product => {
             const row = document.createElement('tr');
-            const codeCell = document.createElement('td');
-            const descCell = document.createElement('td');
-            const priceCell = document.createElement('td');
-            const actionCell = document.createElement('td');
+            row.tabIndex = 0;
+            row.title = 'Haz clic en Agregar para añadir a la lista temporal';
 
+            const codeCell = document.createElement('td');
             codeCell.textContent = product.code;
-            descCell.textContent = product.description;
+
+            const descCell = document.createElement('td');
+            // Truncar descripción larga y mostrar tooltip
+            if (product.description.length > 40) {
+                descCell.textContent = product.description.slice(0, 40) + '...';
+                descCell.title = product.description;
+            } else {
+                descCell.textContent = product.description;
+            }
+
+            const priceCell = document.createElement('td');
             priceCell.textContent = product.precio_IDI || '0';
 
+            const actionCell = document.createElement('td');
             const addButton = document.createElement('button');
             addButton.className = 'btn-add';
             addButton.textContent = 'Agregar';
+            addButton.title = 'Agregar a lista temporal';
             addButton.onclick = () => addToTempList(product);
             actionCell.appendChild(addButton);
 
@@ -405,87 +383,93 @@
             row.appendChild(actionCell);
             productTable.appendChild(row);
         });
-    }
-
-    // Función para agregar productos a la lista temporal
-    function addToTempList(product) {
-        const existing = selectedProducts.find(p => p.code === product.code);
-        if (!existing) {
-            selectedProducts.push({
-                ...product,
-                quantity: 1
-            });
-            updateTempListDisplay();
+        // Si no hay productos, mostrar mensaje
+        if (productsToDisplay.length === 0) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 4;
+            cell.textContent = 'No se encontraron productos.';
+            cell.style.textAlign = 'center';
+            row.appendChild(cell);
+            productTable.appendChild(row);
         }
     }
 
-    // Función para actualizar la lista temporal
+    function addToTempList(product) {
+        const existing = selectedProducts.find(p => p.code === product.code);
+        if (!existing) {
+            selectedProducts.push({ ...product, quantity: 1 });
+            updateTempListDisplay();
+            showNotification('Producto agregado a la lista.');
+        } else {
+            showNotification('Ya está en la lista.', 'warning');
+        }
+    }
+
     function updateTempListDisplay() {
         tempListBody.innerHTML = '';
         selectedProducts.forEach((product, index) => {
             const row = document.createElement('tr');
-
             const codeCell = document.createElement('td');
             codeCell.textContent = product.code;
-
             const descCell = document.createElement('td');
             descCell.textContent = product.description;
-
             const qtyCell = document.createElement('td');
             const qtyInput = document.createElement('input');
             qtyInput.type = 'number';
             qtyInput.min = 1;
             qtyInput.value = product.quantity;
             qtyInput.className = 'quantity-input';
+            qtyInput.title = 'Modificar cantidad';
             qtyInput.onchange = (e) => updateQuantity(index, e.target.value);
             qtyCell.appendChild(qtyInput);
-
             const priceCell = document.createElement('td');
             priceCell.textContent = product.precio_IDI;
-
             const actionCell = document.createElement('td');
             const removeButton = document.createElement('button');
             removeButton.className = 'btn-remove';
             removeButton.textContent = 'Eliminar';
+            removeButton.title = 'Eliminar de lista temporal';
             removeButton.onclick = () => removeFromTempList(index);
             actionCell.appendChild(removeButton);
-
             row.appendChild(codeCell);
             row.appendChild(descCell);
             row.appendChild(qtyCell);
             row.appendChild(priceCell);
             row.appendChild(actionCell);
-
             tempListBody.appendChild(row);
         });
     }
 
-    // Función para actualizar la cantidad de un producto en la lista temporal
     function updateQuantity(index, newQuantity) {
-        if (newQuantity >= 1) {
-            selectedProducts[index].quantity = parseInt(newQuantity);
+        const val = parseInt(newQuantity);
+        if (val >= 1) {
+            selectedProducts[index].quantity = val;
+            showNotification('Cantidad actualizada.');
         }
     }
 
-    // Función para eliminar un producto de la lista temporal
     function removeFromTempList(index) {
         selectedProducts.splice(index, 1);
         updateTempListDisplay();
+        showNotification('Producto eliminado.');
     }
 
-    // Función para limpiar toda la lista temporal
     function clearTempList() {
+        if (selectedProducts.length === 0) {
+            showNotification('La lista ya está vacía.', 'warning');
+            return;
+        }
         selectedProducts = [];
         updateTempListDisplay();
+        showNotification('Lista temporal vaciada.');
     }
 
-    // Función para descargar la lista temporal en formato Excel (modificada)
     function downloadTempList() {
         if (selectedProducts.length === 0) {
             showNotification('La lista temporal está vacía.', 'warning');
             return;
         }
-
         const workbook = XLSX.utils.book_new();
         const worksheetData = selectedProducts.map(product => ({
             'IdClieprov': '20440459588',
@@ -493,7 +477,6 @@
             'Idmedida': product.idmedida,
             'Cantidad': product.quantity,
             'Precio': product.precio_IDI,
-            // Campos restantes vacíos
             'Importe': '',
             'Precio Mof': '',
             'Importe Mof': '',
@@ -506,15 +489,13 @@
             'IdMedida2': '',
             'Cantidad 2': ''
         }));
-
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedido');
         XLSX.writeFile(workbook, 'pedido.xlsx');
         showNotification('Lista descargada correctamente.');
     }
 
-    // Función debounce para mejorar la interacción de búsqueda
-    function debounce(func, delay = 300) {
+    function debounce(func, delay = 250) {
         let timeoutId;
         return (...args) => {
             clearTimeout(timeoutId);
@@ -522,28 +503,34 @@
         };
     }
 
-    // Función para filtrar productos
+    // Cambia la función de búsqueda para mostrar solo resultados o un máximo de 50 si no hay búsqueda
     function filterProducts() {
-        const query = searchQuery.value.toLowerCase();
-        const filteredProducts = products.filter(product => {
-            const code = String(product.code || '').toLowerCase();
-            const description = String(product.description || '').toLowerCase();
-            return code.includes(query) || description.includes(query);
-        });
-
-        searchResults.textContent = filteredProducts.length ?
-            `Se encontraron ${filteredProducts.length} productos.` :
-            'No se encontraron productos.';
-
+        const query = searchQuery.value.trim().toLowerCase();
+        if (!products.length) {
+            searchResults.textContent = 'Primero cargue un archivo Excel.';
+            productTable.innerHTML = '';
+            return;
+        }
+        let filteredProducts;
+        if (query) {
+            filteredProducts = products.filter(product => {
+                const code = String(product.code || '').toLowerCase();
+                const description = String(product.description || '').toLowerCase();
+                return code.includes(query) || description.includes(query);
+            });
+            searchResults.textContent = filteredProducts.length ?
+                `Se encontraron ${filteredProducts.length} productos.` :
+                'No se encontraron productos.';
+        } else {
+            // Si no hay búsqueda, muestra solo los primeros 10 productos
+            filteredProducts = products.slice(0, 10);
+            searchResults.textContent = `Mostrando los primeros 10 productos. Use la búsqueda para filtrar.`;
+        }
         displayProducts(filteredProducts);
     }
 
-    // Aplicar debounce al evento de búsqueda
     searchQuery.addEventListener('input', debounce(filterProducts));
-
-    // Evento para cargar archivo Excel
     excelFileInput.addEventListener('change', loadExcelFile);
 </script>
-
 </body>
 </html>
