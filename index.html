@@ -201,6 +201,18 @@
             table { font-size: 11px; }
             .temp-list-header { flex-direction: column; gap: 4px; }
         }
+        .download-template-link {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 8px;
+            text-decoration: none;
+            opacity: 0.75;
+            transition: opacity 0.2s;
+        }
+        .download-template-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -215,6 +227,13 @@
     <div class="file-input-container">
         <label for="excelFile">Cargar archivo Excel</label>
         <input type="file" id="excelFile" accept=".xlsx, .xls">
+        <a href="https://docs.google.com/spreadsheets/d/1Zv_CZP5UzhB3HGBwCtqjKG23FmgOrGYG/edit?gid=1158706355#gid=1158706355"
+           target="_blank"
+           class="download-template-link"
+           title="Descargar plantilla desde Google Sheets">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" style="vertical-align:middle;margin-right:3px;fill:#2980b9;" viewBox="0 0 20 20"><path d="M13 10V3H7v7H4l6 7 6-7h-3zm-2 5.17L7.53 11H9V5h2v6h1.47L11 15.17zM5 18h10v-2H5v2z"/></svg>
+            <span style="font-size:11px;color:#2980b9;vertical-align:middle;">Descargar plantilla</span>
+        </a>
     </div>
     <div class="product-list">
         <table id="productTable">
