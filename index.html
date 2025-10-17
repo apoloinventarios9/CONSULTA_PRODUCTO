@@ -4,552 +4,1283 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Productos - Miguel Fajardo</title>
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
     <style>
-        html { font-size: 90%; }
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f7fafd;
-            color: #222;
-            padding: 0 6px;
-            font-size: 13.5px;
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        --card-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        --hover-shadow: 0 4px 8px rgba(0,0,0,0.12);
+        --primary-dark: #002060;
+        --transition-speed: 0.25s;
+    }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: var(--secondary-gradient);
+        min-height: 100vh;
+        font-size: 0.65rem;
+    }
+
+    .main-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 0.7rem 0;
+        margin-bottom: 0.7rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .compact-bar {
+        background: #e3f6ff;
+        color: #1976d2;
+        font-size: 0.88rem;
+        padding: 2px 0 2px 0;
+        text-align: center;
+        border-bottom: 1px solid #90caf9;
+        margin-bottom: 2px;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        box-shadow: 0 1px 4px #0001;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 38px auto 0 auto;
+        padding: 8px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: var(--card-shadow);
+        transition: all var(--transition-speed);
+        border: none;
+        margin-bottom: 0.7rem;
+        width: 100%;
+    }
+
+    .card-header {
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: 10px 10px 0 0 !important;
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .search-container {
+        background: white;
+        border-radius: 10px;
+        padding: 0.7rem 1rem;
+        margin-bottom: 0.7rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .form-control {
+        border-radius: 7px;
+        border: 1px solid #e0e6ed;
+        padding: 0.35rem 0.7rem;
+        font-size: 0.82rem;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 2px rgba(102,126,234,0.18);
+        border-color: #667eea;
+    }
+
+    .btn {
+        border-radius: 7px;
+        padding: 0.25rem 0.6rem;
+        font-weight: 500;
+        font-size: 0.75rem;
+        transition: all var(--transition-speed);
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        box-shadow: var(--hover-shadow);
+        transform: translateY(-1px);
+    }
+
+    .table {
+        margin-bottom: 0;
+        font-size: 0.65rem;
+    }
+
+    .table th {
+        background: var(--primary-dark);
+        color: white;
+        font-weight: 500;
+        border: none;
+        padding: 0.25rem 0.18rem;
+        font-size: 0.65rem;
+        white-space: nowrap;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 0.18rem 0.18rem;
+        border-color: #e0e6ed;
+        font-size: 0.65rem;
+    }
+
+    /* Optimizar distribución de columnas */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 15%; } /* Código */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 45%; } /* Descripción */
+    .table th:nth-child(3), .table td:nth-child(3) { width: 15%; } /* Precio/Cantidad */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 15%; } /* Precio IDI (tabla temporal) */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 10%; } /* Acción */
+
+    /* Mejorar selección y copia de precios */
+    .price-cell {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 0.3rem 0.5rem;
+        font-weight: 600;
+        color: #0d6efd;
+        cursor: default;
+        transition: all 0.2s;
+        user-select: text;
+        font-family: 'Courier New', monospace;
+    }
+
+    .price-cell:hover {
+        background-color: #e3f2fd;
+        border-color: #2196f3;
+    }
+
+    .price-cell[style*="cursor: pointer"]:hover {
+        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        transform: scale(1.02);
+    }
+
+    .price-cell[style*="cursor: pointer"]:active {
+        background-color: #1976d2;
+        color: white;
+        border-color: #1976d2;
+        transform: scale(0.98);
+    }
+
+    .copy-btn {
+        padding: 0.15rem 0.3rem;
+        font-size: 0.6rem;
+        margin-left: 0.3rem;
+        border-radius: 3px;
+    }
+
+    /* Switch toggle para activar copia rápida */
+    .copy-mode-switch {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+
+    .switch-label {
+        font-size: 0.75rem;
+        color: white;
+        white-space: nowrap;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f8fafd;
+    }
+
+    .table tbody tr:hover {
+        background-color: #e3f6ff;
+    }
+
+    .badge {
+        padding: 0.3em 0.7em;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.8em;
+    }
+
+    .notification-toast {
+        position: fixed;
+        top: 38px;
+        right: 18px;
+        z-index: 1050;
+        font-size: 0.88rem;
+        min-width: 180px;
+        box-shadow: 0 2px 8px #0002;
+        border-radius: 7px;
+        padding: 0.5em 1em;
+        background: #fff;
+        color: #1976d2;
+        border: 1px solid #90caf9;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .notification-toast .emoji {
+        font-size: 1.2em;
+        margin-right: 4px;
+    }
+
+    .version-message {
+        background: linear-gradient(135deg, #e3f6ff 0%, #ffffff 100%);
+        border-left: 4px solid #667eea;
+        box-shadow: var(--card-shadow);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    /* Estilos kawaii para el modal de bienvenida */
+    .welcome-emoji {
+        font-size: 2.5rem;
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    .features-list {
+        margin: 1.5rem 0;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 10px;
+        border-left: 3px solid #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .feature-icon {
+        font-size: 1.5rem;
+        margin-right: 0.8rem;
+        min-width: 40px;
+        text-align: center;
+        animation: pulse 3s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .feature-text strong {
+        color: #2c3e50;
+        font-size: 0.85rem;
+    }
+
+    .feature-text small {
+        color: #7f8c8d;
+        font-size: 0.75rem;
+        line-height: 1.3;
+    }
+
+    .footer-message {
+        margin-top: 1.5rem;
+        text-align: center;
+        padding: 1rem;
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+    }
+
+    .team-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #495057;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .badge-emoji {
+        font-size: 1.2rem;
+    }
+
+    .creator-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0;
+        font-style: italic;
+    }
+
+    .version-message .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .version-message .modal-header * {
+        color: white !important;
+    }
+
+    .version-message .modal-title {
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .version-message .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .version-message .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Botón de ayuda translúcido en esquina */
+    .help-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.15);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        color: rgba(102, 126, 234, 0.7);
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        z-index: 999;
+        opacity: 0.4;
+    }
+
+    .help-btn:hover {
+        opacity: 1;
+        background: rgba(102, 126, 234, 0.25);
+        border-color: rgba(102, 126, 234, 0.5);
+        color: rgba(102, 126, 234, 1);
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .help-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Efecto de pulso sutil */
+    .help-btn::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+    }
+
+    .help-btn:hover::before {
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .container { max-width: 98vw; padding: 2px; }
+        .card { margin: 0.3rem; }
+        .btn { width: 100%; margin-bottom: 0.3rem; }
+        .compact-bar { font-size: 0.8rem; }
+        
+        /* Ajustar botón de ayuda en móviles */
+        .help-btn {
+            bottom: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
         }
-        header {
-            background: linear-gradient(90deg,#222,#3a3a3a);
-            color: #fff;
-            padding: 8px 0;
-            text-align: center;
-            font-size: 19.8px;
-            font-weight: 600;
-            border-radius: 5px;
-            margin: 14px 0 10px 0;
-            letter-spacing: 0.5px;
-            box-shadow: 0 1px 6px #0001;
-        }
-        .container {
-            max-width: 630px;
-            margin: 14px auto;
-            padding: 12px;
-            background: #fff;
-            border-radius: 6px;
-            box-shadow: 0 1px 8px #0001;
-        }
-        .search-container {
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .search-container h2 {
-            font-size: 15.3px;
-            margin-bottom: 4px;
-            color: #1a1a1a;
-            font-weight: 500;
-        }
-        input[type="text"] {
-            padding: 6px;
-            margin: 4px 0;
-            width: 88%;
-            max-width: 300px;
-            border: 1px solid #bfc9d1;
-            border-radius: 3px;
-            font-size: 13.5px;
-            transition: border 0.2s;
-            background: #f9fbfc;
-        }
-        input[type="text"]:focus { border-color: #5dade2; background: #f4faff; }
-        .search-results {
-            font-size: 12.6px;
-            margin: 4px 0;
-            color: #4a4a4a;
-        }
-        .product-list { margin-top: 7px; width: 100%; overflow-x: auto; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 7px;
-            font-size: 12.6px;
-            background: #fcfdff;
-        }
-        th, td {
-            padding: 5px 4px;
-            text-align: left;
-            border-bottom: 1px solid #e3e8ee;
-        }
-        th {
-            background: #5dade2;
-            color: #fff;
-            font-size: 12.6px;
-            font-weight: 500;
-            letter-spacing: 0.2px;
-        }
-        td { background: #f7fafd; }
-        tr:hover td { background: #e3f1fa; }
-        .footer {
-            text-align: center;
-            font-size: 11.7px;
-            color: #9ca3af;
-            margin-top: 22px;
-        }
-        .notification, .loading {
-            padding: 6px;
-            margin-top: 8px;
-            border-radius: 3px;
-            display: none;
-            font-size: 12.6px;
-            text-align: center;
-        }
-        .notification { background: #43a047; color: #fff; }
-        .notification.error { background: #e53935; }
-        .notification.warning { background: #fbc02d; color: #222; }
-        .loading { background: #5dade2; color: #fff; }
-        .file-input-container {
-            margin: 8px 0;
-            text-align: center;
-        }
-        .file-input-container label {
-            display: inline-block;
-            padding: 5px 12px;
-            background: #5dade2;
-            color: #fff;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12.6px;
-            transition: background 0.2s;
-            font-weight: 500;
-        }
-        .file-input-container label:hover { background: #2980b9; }
-        .file-input-container input[type="file"] { display: none; }
-        .temp-list-container {
-            margin-top: 18px;
-            border-top: 1.5px solid #5dade2;
-            padding-top: 8px;
-        }
-        .temp-list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 7px;
-        }
-        .temp-list-header h2 { font-size: 14.4px; font-weight: 500; }
-        .temp-list-table th { background: #2980b9; }
-        .quantity-input {
-            width: 38px;
-            padding: 2px;
-            text-align: center;
-            font-size: 12.6px;
-            border-radius: 2px;
-            border: 1px solid #bfc9d1;
-        }
-        .btn-remove, .btn-add, .btn-clear, .btn-download {
-            border: none;
-            border-radius: 2px;
-            cursor: pointer;
-            font-size: 11.7px;
-            padding: 4px 9px;
-            margin: 0 1px;
-            transition: background 0.2s, box-shadow 0.2s;
-            box-shadow: 0 1px 2px #0001;
-        }
-        .btn-remove { background: #e74c3c; color: #fff; }
-        .btn-remove:hover { background: #c0392b; }
-        .btn-add { background: #43a047; color: #fff; }
-        .btn-add:hover { background: #2e7031; }
-        .btn-clear { background: #b0b0b0; color: #fff; }
-        .btn-clear:hover { background: #888; }
-        .btn-download { background: #5dade2; color: #fff; margin-left: 4px; }
-        .btn-download:hover { background: #2980b9; }
-        .sr-only {
-            position: absolute;
-            width: 1px; height: 1px; padding: 0; margin: -1px;
-            overflow: hidden; clip: rect(0,0,0,0); border: 0;
-        }
-        .success-spinner-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(44, 62, 80, 0.18);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            pointer-events: none;
-            animation: fadeIn 0.5s;
-        }
-        .success-spinner-box {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px #0001;
-            padding: 18px 28px;
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            pointer-events: auto;
-        }
-        .success-spinner-box span.emoji {
-            font-size: 36px;
-            margin-bottom: 4px;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @media (max-width: 600px) {
-            .container { width: 100%; padding: 4px; }
-            input[type="text"] { max-width: 100%; }
-            table { font-size: 11px; }
-            .temp-list-header { flex-direction: column; gap: 4px; }
-        }
-        .download-template-link {
-            display: inline-flex;
-            align-items: center;
-            margin-left: 8px;
-            text-decoration: none;
-            opacity: 0.75;
-            transition: opacity 0.2s;
-        }
-        .download-template-link:hover {
-            opacity: 1;
-            text-decoration: underline;
-        }
+    }
+
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .file-select-area {
+        background: #f5f7fa;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px #0001;
+        padding: 0.5rem 1rem;
+        margin-bottom: 0.7rem;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        font-size: 0.78rem;
+    }
+
+    .file-select-area .btn-file-label {
+        background: var(--primary-gradient);
+        color: #fff;
+        border-radius: 7px;
+        padding: 0.32rem 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-bottom: 0;
+        font-size: 0.88rem;
+        transition: background 0.2s;
+    }
+
+    .file-select-area .btn-file-label:hover {
+        background: #764ba2;
+    }
+
+    .file-select-area input[type="file"] {
+        display: none;
+    }
+
+    /* Make card headers consistent width and center their content */
+    .card-header.d-flex {
+        justify-content: space-between !important;
+        align-items: center;
+        width: 100%;
+        gap: 0.6rem;
+    }
+    .card-header.d-flex > span:first-child {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+    .card .table-responsive, .card .table {
+        width: 100%;
+    }
+    
+    /* Ensure card body also matches table width */
+    .card .card-body {
+        width: 100%;
+        overflow-x: visible;
+    }
+
+    /* Timestamp small text */
+    #timestampInfo { font-size: 0.78rem; color: #1976d2; opacity: 0.8; }
+
+    .file-select-area .file-icon {
+        font-size: 1.2em;
+        color: #1976d2;
+        margin-right: 2px;
+    }
     </style>
 </head>
 <body>
-<header>Gestión de Productos</header>
-<div class="container">
-    <div class="search-container">
-        <h2>Buscar Productos</h2>
-        <label for="searchQuery" class="sr-only">Buscar productos</label>
-        <input type="text" id="searchQuery" placeholder="Buscar por Código o Descripción" autocomplete="off">
-        <div class="search-results" id="searchResults"></div>
-    </div>
-    <div class="file-input-container">
-        <label for="excelFile">Cargar archivo Excel</label>
-        <input type="file" id="excelFile" accept=".xlsx, .xls">
-        <a href="https://docs.google.com/spreadsheets/d/1Zv_CZP5UzhB3HGBwCtqjKG23FmgOrGYG/edit?gid=1158706355#gid=1158706355"
-           target="_blank"
-           class="download-template-link"
-           title="Descargar plantilla desde Google Sheets">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" style="vertical-align:middle;margin-right:3px;fill:#2980b9;" viewBox="0 0 20 20"><path d="M13 10V3H7v7H4l6 7 6-7h-3zm-2 5.17L7.53 11H9V5h2v6h1.47L11 15.17zM5 18h10v-2H5v2z"/></svg>
-            <span style="font-size:11px;color:#2980b9;vertical-align:middle;">Descargar plantilla</span>
-        </a>
-    </div>
-    <div class="product-list">
-        <table id="productTable">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Descripción</th>
-                    <th>Precio IDI</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Productos dinámicos -->
-            </tbody>
-        </table>
-    </div>
-    <div class="temp-list-container">
-        <div class="temp-list-header">
-            <h2>Lista Temporal</h2>
-            <div>
-                <button class="btn-clear" onclick="clearTempList()">Limpiar</button>
-                <button class="btn-download" onclick="downloadTempList()">Descargar</button>
-            </div>
+<div id="compactBar" class="compact-bar" style="display:none;"></div>
+    <header class="main-header text-center">
+        <h1 class="h3 mb-0">Gestión de Productos</h1>
+    </header>
+
+    <div class="container">
+        <!-- Timestamp -->
+        <div id="dataTimestamp" class="alert alert-info d-none fade-in">
+            <i class="bi bi-clock me-2"></i>
+            <span></span>
         </div>
-        <table class="temp-list-table">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th>Precio IDI</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody id="tempListBody">
-                <!-- Contenido dinámico -->
-            </tbody>
-        </table>
-    </div>
-    <div class="loading" id="loadingNotification">Cargando datos...</div>
-    <div class="notification" id="notification">Datos cargados correctamente.</div>
-    <!-- Reemplaza el div del spinner -->
-    <div id="successSpinner" style="display:none;"></div>
-</div>
-<div class="footer">
-    <p>Creado por Miguel Fajardo - Analista de Inventarios</p>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
-<script>
-    const searchQuery = document.getElementById('searchQuery');
-    const searchResults = document.getElementById('searchResults');
-    const productTable = document.getElementById('productTable').getElementsByTagName('tbody')[0];
-    const notification = document.getElementById('notification');
-    const loadingNotification = document.getElementById('loadingNotification');
-    const excelFileInput = document.getElementById('excelFile');
-    const tempListBody = document.getElementById('tempListBody');
-    const successSpinner = document.getElementById('successSpinner');
 
-    let products = [];
-    let selectedProducts = [];
-
-    function showNotification(message, type = 'success') {
-        notification.textContent = message;
-        notification.className = `notification ${type}`;
-        notification.style.display = 'block';
-        if (type === 'success') {
-            notification.style.background = '#43a047';
-            notification.style.color = '#fff';
-        } else if (type === 'error') {
-            notification.style.background = '#e53935';
-            notification.style.color = '#fff';
-        } else if (type === 'warning') {
-            notification.style.background = '#fbc02d';
-            notification.style.color = '#222';
-        }
-        setTimeout(() => { notification.style.display = 'none'; }, 2200);
-    }
-
-    function showSuccessSpinner(count) {
-        successSpinner.innerHTML = `
-            <div class="success-spinner-overlay">
-                <div class="success-spinner-box">
-                    <span class="emoji">✅</span>
-                    <span>Archivo importado con éxito</span>
-                    <span style="font-size:17px;">${count} productos cargados.</span>
+        <!-- Search Section -->
+        <div class="search-container fade-in">
+            <h5 class="mb-3">Buscar Productos</h5>
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" id="searchQuery" class="form-control" 
+                           placeholder="Buscar por Código o Descripción">
+                </div>
+                <div class="col-md-4">
+                    <div class="file-select-area">
+                        <i class="bi bi-file-earmark-excel file-icon"></i>
+                        <label class="btn-file-label" for="excelFile"><i class="bi bi-upload me-1"></i> Seleccionar archivo</label>
+                        <span id="fileName" class="small text-muted">Ningún archivo seleccionado</span>
+                        <input type="file" id="excelFile" accept=".xlsx, .xls">
+                    </div>
                 </div>
             </div>
-        `;
-        successSpinner.style.display = 'block';
-        // Oculta el input de archivo
-        document.querySelector('.file-input-container').style.display = 'none';
-        setTimeout(() => { successSpinner.style.display = 'none'; }, 3500);
-    }
+            <div class="row g-0 align-items-center mb-1">
+                <div class="col-auto small text-muted mt-2" id="searchResults"></div>
+                <div class="col text-end" id="timestampInfo" style="display:none;"></div>
+            </div>
+        </div>
 
-    function loadExcelFile(event) {
-        const file = event.target.files[0];
-        if (file) {
-            loadingNotification.style.display = 'block';
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: 'binary' });
-                    const sheetName = workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[sheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(sheet);
-                    if (!jsonData[0]?.hasOwnProperty('Idproducto')) {
-                        throw new Error('Formato incorrecto. Falta columna Idproducto.');
-                    }
-                    products = jsonData.map(item => ({
-                        code: String(item['Idproducto'] || ''),
-                        description: String(item['Descripcion'] || ''),
-                        idmedida: String(item['Idmedida'] || ''),
-                        idproducto_agritask: String(item['Idproducto_agritask'] || ''),
-                        precio_IDI: Number(item['Precio_IDI']) || 0,
-                        precio_Venta: Number(item['Precio_Venta']) || 0,
-                        precio_Compra: Number(item['Precio_Compra']) || 0
-                    }));
-                    // Mostrar solo los primeros 10 productos al cargar
-                    displayProducts(products.slice(0, 10));
-                    searchResults.textContent = 'Mostrando los primeros 10 productos. Use la búsqueda para filtrar.';
-                    showSuccessSpinner(products.length);
-                } catch (error) {
-                    showNotification(`Error: ${error.message}`, 'error');
-                } finally {
-                    loadingNotification.style.display = 'none';
+        <!-- Products Table -->
+        <div class="card fade-in">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Lista de Productos</span>
+                <div class="d-flex align-items-center">
+                    <div class="copy-mode-switch">
+                        <span class="switch-label">Copia rápida:</span>
+                        <label class="switch">
+                            <input type="checkbox" id="quickCopyToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <a href="https://docs.google.com/spreadsheets/d/1Zv_CZP5UzhB3HGBwCtqjKG23FmgOrGYG/edit?gid=1158706355#gid=1158706355" 
+                       target="_blank" class="btn btn-sm btn-light">
+                        <i class="bi bi-download me-1"></i>Descargar Plantilla
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table id="productTable" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Precio IDI <small>📋</small></th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temporary List -->
+        <div class="card fade-in">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Lista Temporal</span>
+                <div>
+                    <button class="btn btn-sm btn-light me-2" onclick="clearTempList()">
+                        <i class="bi bi-trash me-1"></i>Limpiar
+                    </button>
+                    <button class="btn btn-sm btn-primary" onclick="downloadTempList()">
+                        <i class="bi bi-download me-1"></i>Descargar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio IDI</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tempListBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Progress -->
+        <div id="progressContainer" class="progress mb-3 d-none">
+            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                 role="progressbar" style="width: 0%">
+                <span id="progressText">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version Message -->
+    <div id="versionMessage" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content version-message">
+                <div class="modal-header border-0 text-center">
+                    <div class="w-100">
+                        <div class="welcome-emoji mb-2">🎉✨</div>
+                        <h4 class="modal-title text-white fw-bold">¡Bienvenido de vuelta! 👋</h4>
+                        <p class="subtitle text-light mb-0">Gestión de Productos v4.0 🚀</p>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <div class="feature-icon">📁</div>
+                            <div class="feature-text">
+                                <strong>Carga de archivos mejorada</strong><br>
+                                <small>Ahora puedes cargar archivos Excel de gran tamaño sin problemas con barra de progreso visual</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">💾</div>
+                            <div class="feature-text">
+                                <strong>Almacenamiento inteligente</strong><br>
+                                <small>La información se guarda localmente y se mantiene entre sesiones automáticamente</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">📋</div>
+                            <div class="feature-text">
+                                <strong>Copia súper fácil de precios</strong><br>
+                                <small>Haz clic en cualquier precio IDI para copiarlo al portapapeles. Activa el modo "Copia rápida" cuando lo necesites</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">🎨</div>
+                            <div class="feature-text">
+                                <strong>Interfaz optimizada</strong><br>
+                                <small>Tablas más anchas, fuentes optimizadas y diseño centrado para mejor visualización en PC</small>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">🔍</div>
+                            <div class="feature-text">
+                                <strong>Búsqueda mejorada</strong><br>
+                                <small>Encuentra productos más rápido con filtros inteligentes y resultados instantáneos</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-message">
+                        <div class="team-badge">
+                            <span class="badge-emoji">💼</span>
+                            <strong>Dpto. Logística - Tiendas Apolo SAC</strong>
+                        </div>
+                        <p class="creator-text">💻 Creado por 👨🏻‍🦱 Miguel Fajardo</p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-primary btn-lg px-4" data-bs-dismiss="modal">
+                        <span class="me-2">🎯</span>¡Empezar a usar!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notification-toast" id="notification"></div>
+
+    <!-- Botón de ayuda/info escondido -->
+    <button id="helpButton" class="help-btn" title="Ver funcionalidades de la aplicación">
+        <i class="bi bi-question-circle"></i>
+    </button>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                    <h5>¡Archivo importado con éxito!</h5>
+                    <p class="mb-0">Los datos permanecerán guardados en este dispositivo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-muted py-3">
+        <small>Creado por Miguel Fajardo - Jefe de Logistica</small>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+
+    <script>
+        // Código principal de la aplicación
+const searchQuery = document.getElementById('searchQuery');
+const searchResults = document.getElementById('searchResults');
+const productTable = document.getElementById('productTable')?.getElementsByTagName('tbody')[0];
+const notification = document.getElementById('notification');
+const excelFileInput = document.getElementById('excelFile');
+const tempListBody = document.getElementById('tempListBody');
+let products = [];
+let selectedProducts = [];
+let db;
+let quickCopyEnabled = false; // Variable para controlar la copia rápida
+
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('ProductosDB', 1);
+        request.onerror = () => {
+            showNotification('Error al inicializar la base de datos', 'error');
+            reject(request.error);
+        };
+        request.onsuccess = () => {
+            db = request.result;
+            resolve(db);
+        };
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('productos')) {
+                db.createObjectStore('productos', { keyPath: 'id' });
+            }
+        };
+    });
+}
+
+async function saveToIndexedDB(data, timestamp) {
+    try {
+        if (!db) await initDB();
+        return await new Promise((resolve, reject) => {
+            const transaction = db.transaction(['productos'], 'readwrite');
+            const store = transaction.objectStore('productos');
+            const payload = {
+                id: 'productData',
+                products: data,
+                timestamp: timestamp || new Date().toLocaleString('es-ES')
+            };
+            const req = store.put(payload);
+            req.onsuccess = () => {
+                // wait for transaction to complete
+            };
+            transaction.oncomplete = () => {
+                updateTimestampDisplay(payload.timestamp);
+                resolve(true);
+            };
+            transaction.onerror = () => {
+                showNotification('Error al guardar los datos: ' + (transaction.error?.message || 'Error de transacción'), 'error');
+                reject(transaction.error);
+            };
+        });
+    } catch (error) {
+        showNotification('Error al guardar los datos: ' + error.message, 'error');
+        return false;
+    }
+}
+
+async function loadFromIndexedDB() {
+    try {
+        if (!db) await initDB();
+        const transaction = db.transaction(['productos'], 'readonly');
+        const store = transaction.objectStore('productos');
+        const request = store.get('productData');
+        return new Promise((resolve, reject) => {
+            request.onsuccess = () => {
+                if (request.result) {
+                    products = request.result.products;
+                    updateTimestampDisplay(request.result.timestamp);
+                    resolve(true);
+                } else {
+                    resolve(false);
                 }
             };
-            reader.readAsBinaryString(file);
-        }
+            request.onerror = () => reject(request.error);
+        });
+    } catch (error) {
+        showNotification('Error al cargar los datos: ' + error.message, 'error');
+        return false;
     }
+}
 
-    function displayProducts(productsToDisplay) {
-        productTable.innerHTML = '';
-        productsToDisplay.forEach(product => {
-            const row = document.createElement('tr');
-            row.tabIndex = 0;
-            row.title = 'Haz clic en Agregar para añadir a la lista temporal';
+function updateTimestampDisplay(timestamp) {
+    const info = document.getElementById('timestampInfo');
+    if (timestamp) {
+        info.innerHTML = `<small style='display:inline-block;'>📅 Datos cargados el: <b>${timestamp}</b></small>`;
+        info.style.display = 'inline-block';
+    } else {
+        info.style.display = 'none';
+    }
+}
 
-            const codeCell = document.createElement('td');
-            codeCell.textContent = product.code;
+function showVersionMessage() {
+    const versionKey = 'appVersion';
+    const isFirstTime = !localStorage.getItem(versionKey);
+    
+    const modal = new bootstrap.Modal(document.getElementById('versionMessage'));
+    
+    // Ajustar el título según si es primera vez o regreso
+    const titleElement = document.querySelector('#versionMessage .modal-title');
+    const subtitleElement = document.querySelector('#versionMessage .subtitle');
+    
+    if (isFirstTime) {
+        titleElement.textContent = '¡Bienvenido a la versión 4.0!';
+        subtitleElement.textContent = 'Nuevas funcionalidades súper útiles 🚀';
+    } else {
+        titleElement.textContent = '¡Bienvenido de vuelta! 👋';
+        subtitleElement.textContent = 'Gestión de Productos v4.0 🚀';
+    }
+    
+    modal.show();
+    setTimeout(() => {
+        modal.hide();
+    }, 22000);
+}
 
-            const descCell = document.createElement('td');
-            // Truncar descripción larga y mostrar tooltip
-            if (product.description.length > 40) {
-                descCell.textContent = product.description.slice(0, 40) + '...';
-                descCell.title = product.description;
-            } else {
-                descCell.textContent = product.description;
+function showManualVersionMessage() {
+    const modal = new bootstrap.Modal(document.getElementById('versionMessage'));
+    
+    // Ajustar el título para cuando se abre manualmente
+    const titleElement = document.querySelector('#versionMessage .modal-title');
+    const subtitleElement = document.querySelector('#versionMessage .subtitle');
+    
+    titleElement.textContent = '📖 Guía de Funcionalidades';
+    subtitleElement.textContent = 'Todo lo que puedes hacer con esta aplicación ✨';
+    
+    modal.show();
+    // No auto-cerrar cuando se abre manualmente
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const versionKey = 'appVersion';
+    const lastVisitKey = 'lastVisit';
+    let showMsg = false;
+    
+    await initDB();
+    let hasData = await loadFromIndexedDB();
+    
+    // Verificar si es la primera vez o han pasado más de 12 horas
+    const now = Date.now();
+    const lastVisit = localStorage.getItem(lastVisitKey);
+    const twelveHours = 12 * 60 * 60 * 1000; // 12 horas en milisegundos
+    
+    if (!localStorage.getItem(versionKey) && !hasData) {
+        // Primera vez usando la app
+        showMsg = true;
+        localStorage.setItem(versionKey, '4.0');
+        localStorage.setItem(lastVisitKey, now.toString());
+    } else if (lastVisit && (now - parseInt(lastVisit)) > twelveHours) {
+        // Han pasado más de 12 horas desde la última visita
+        showMsg = true;
+        localStorage.setItem(lastVisitKey, now.toString());
+    } else if (!lastVisit) {
+        // No hay registro de última visita, establecer el actual
+        localStorage.setItem(lastVisitKey, now.toString());
+    } else {
+        // Actualizar última visita si no se va a mostrar el mensaje
+        localStorage.setItem(lastVisitKey, now.toString());
+    }
+    
+    if (showMsg) showVersionMessage();
+    try {
+        await initDB();
+        if (await loadFromIndexedDB()) {
+            displayProducts(products.slice(0, 10));
+            searchResults.textContent = 'Mostrando los primeros 10 productos. Use la búsqueda para filtrar.';
+        }
+    } catch (error) {
+        showNotification('Error al cargar los datos guardados: ' + error.message, 'error');
+    }
+});
+
+function showNotification(message, type = 'success') {
+    let emoji = '✅';
+    if (type === 'error') emoji = '❌';
+    if (type === 'warning') emoji = '⚠️';
+    notification.innerHTML = `<span class='emoji'>${emoji}</span> ${message}`;
+    notification.className = `notification-toast alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'warning'} fade-in`;
+    notification.style.display = 'flex';
+    setTimeout(() => { notification.style.display = 'none'; }, 2200);
+}
+
+function showSuccessSpinner(count) {
+    const modal = new bootstrap.Modal(document.getElementById('successModal'));
+    document.querySelector('#successModal h5').innerHTML = `🎉 ¡Archivo importado con éxito! <span style='font-size:1.2em;'>(${count} productos)</span>`;
+    modal.show();
+    setTimeout(() => { modal.hide(); }, 3500);
+}
+
+async function loadExcelFile(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // show file name
+        const fileNameSpan = document.getElementById('fileName');
+        if (fileNameSpan) fileNameSpan.textContent = file.name;
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        progressContainer.classList.remove('d-none');
+        try {
+            const chunks = [];
+            const chunkSize = 1024 * 1024;
+            const fileSize = file.size;
+            let offset = 0;
+            while (offset < fileSize) {
+                const chunk = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = reject;
+                    const slice = file.slice(offset, offset + chunkSize);
+                    reader.readAsArrayBuffer(slice);
+                });
+                chunks.push(chunk);
+                offset += chunkSize;
+                const progress = Math.min(100, Math.round((offset / fileSize) * 100));
+                progressBar.style.width = progress + '%';
+                progressText.textContent = progress + '%';
             }
-
-            const priceCell = document.createElement('td');
-            priceCell.textContent = product.precio_IDI || '0';
-
-            const actionCell = document.createElement('td');
-            const addButton = document.createElement('button');
-            addButton.className = 'btn-add';
-            addButton.textContent = 'Agregar';
-            addButton.title = 'Agregar a lista temporal';
-            addButton.onclick = () => addToTempList(product);
-            actionCell.appendChild(addButton);
-
-            row.appendChild(codeCell);
-            row.appendChild(descCell);
-            row.appendChild(priceCell);
-            row.appendChild(actionCell);
-            productTable.appendChild(row);
-        });
-        // Si no hay productos, mostrar mensaje
-        if (productsToDisplay.length === 0) {
-            const row = document.createElement('tr');
-            const cell = document.createElement('td');
-            cell.colSpan = 4;
-            cell.textContent = 'No se encontraron productos.';
-            cell.style.textAlign = 'center';
-            row.appendChild(cell);
-            productTable.appendChild(row);
-        }
-    }
-
-    function addToTempList(product) {
-        const existing = selectedProducts.find(p => p.code === product.code);
-        if (!existing) {
-            selectedProducts.push({ ...product, quantity: 1 });
-            updateTempListDisplay();
-            showNotification('Producto agregado a la lista.');
-        } else {
-            showNotification('Ya está en la lista.', 'warning');
-        }
-    }
-
-    function updateTempListDisplay() {
-        tempListBody.innerHTML = '';
-        selectedProducts.forEach((product, index) => {
-            const row = document.createElement('tr');
-            const codeCell = document.createElement('td');
-            codeCell.textContent = product.code;
-            const descCell = document.createElement('td');
-            descCell.textContent = product.description;
-            const qtyCell = document.createElement('td');
-            const qtyInput = document.createElement('input');
-            qtyInput.type = 'number';
-            qtyInput.min = 1;
-            qtyInput.value = product.quantity;
-            qtyInput.className = 'quantity-input';
-            qtyInput.title = 'Modificar cantidad';
-            qtyInput.onchange = (e) => updateQuantity(index, e.target.value);
-            qtyCell.appendChild(qtyInput);
-            const priceCell = document.createElement('td');
-            priceCell.textContent = product.precio_IDI;
-            const actionCell = document.createElement('td');
-            const removeButton = document.createElement('button');
-            removeButton.className = 'btn-remove';
-            removeButton.textContent = 'Eliminar';
-            removeButton.title = 'Eliminar de lista temporal';
-            removeButton.onclick = () => removeFromTempList(index);
-            actionCell.appendChild(removeButton);
-            row.appendChild(codeCell);
-            row.appendChild(descCell);
-            row.appendChild(qtyCell);
-            row.appendChild(priceCell);
-            row.appendChild(actionCell);
-            tempListBody.appendChild(row);
-        });
-    }
-
-    function updateQuantity(index, newQuantity) {
-        const val = parseInt(newQuantity);
-        if (val >= 1) {
-            selectedProducts[index].quantity = val;
-            showNotification('Cantidad actualizada.');
-        }
-    }
-
-    function removeFromTempList(index) {
-        selectedProducts.splice(index, 1);
-        updateTempListDisplay();
-        showNotification('Producto eliminado.');
-    }
-
-    function clearTempList() {
-        if (selectedProducts.length === 0) {
-            showNotification('La lista ya está vacía.', 'warning');
-            return;
-        }
-        selectedProducts = [];
-        updateTempListDisplay();
-        showNotification('Lista temporal vaciada.');
-    }
-
-    function downloadTempList() {
-        if (selectedProducts.length === 0) {
-            showNotification('La lista temporal está vacía.', 'warning');
-            return;
-        }
-        const workbook = XLSX.utils.book_new();
-        const worksheetData = selectedProducts.map(product => ({
-            'IdClieprov': '20440459588',
-            'IdProducto': product.code,
-            'Idmedida': product.idmedida,
-            'Cantidad': product.quantity,
-            'Precio': product.precio_IDI,
-            'Importe': '',
-            'Precio Mof': '',
-            'Importe Mof': '',
-            'Precio Mex': '',
-            'Importe Mex': '',
-            'IdConsumidor': '',
-            'LoteP': '',
-            'Serie': '',
-            'IdProductoDestino': '',
-            'IdMedida2': '',
-            'Cantidad 2': ''
-        }));
-        const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedido');
-        XLSX.writeFile(workbook, 'pedido.xlsx');
-        showNotification('Lista descargada correctamente.');
-    }
-
-    function debounce(func, delay = 250) {
-        let timeoutId;
-        return (...args) => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
-    // Cambia la función de búsqueda para mostrar solo resultados o un máximo de 50 si no hay búsqueda
-    function filterProducts() {
-        const query = searchQuery.value.trim().toLowerCase();
-        if (!products.length) {
-            searchResults.textContent = 'Primero cargue un archivo Excel.';
-            productTable.innerHTML = '';
-            return;
-        }
-        let filteredProducts;
-        if (query) {
-            filteredProducts = products.filter(product => {
-                const code = String(product.code || '').toLowerCase();
-                const description = String(product.description || '').toLowerCase();
-                return code.includes(query) || description.includes(query);
+            const fullBuffer = new Uint8Array(fileSize);
+            let position = 0;
+            chunks.forEach(chunk => {
+                fullBuffer.set(new Uint8Array(chunk), position);
+                position += chunk.byteLength;
             });
-            searchResults.textContent = filteredProducts.length ?
-                `Se encontraron ${filteredProducts.length} productos.` :
-                'No se encontraron productos.';
-        } else {
-            // Si no hay búsqueda, muestra solo los primeros 10 productos
-            filteredProducts = products.slice(0, 10);
-            searchResults.textContent = `Mostrando los primeros 10 productos. Use la búsqueda para filtrar.`;
+            const data = new Uint8Array(fullBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(sheet);
+            if (!jsonData[0]?.hasOwnProperty('Idproducto')) {
+                throw new Error('Formato incorrecto. Falta la columna Idproducto.');
+            }
+            products = jsonData.map(item => ({
+                code: String(item['Idproducto'] || ''),
+                description: String(item['Descripcion'] || ''),
+                idmedida: String(item['Idmedida'] || ''),
+                idproducto_agritask: String(item['Idproducto_agritask'] || ''),
+                precio_IDI: Number(item['Precio_IDI']) || 0,
+                precio_Venta: Number(item['Precio_Venta']) || 0,
+                precio_Compra: Number(item['Precio_Compra']) || 0
+            }));
+            const timestamp = new Date().toLocaleString('es-ES');
+            await saveToIndexedDB(products, timestamp);
+            displayProducts(products.slice(0, 10));
+            searchResults.textContent = 'Mostrando los primeros 10 productos. Use la búsqueda para filtrar.';
+            showSuccessSpinner(products.length);
+        } catch (error) {
+            showNotification(`Error: ${error.message}`, 'error');
+        } finally {
+            progressContainer.classList.add('d-none');
         }
-        displayProducts(filteredProducts);
     }
+}
 
-    searchQuery.addEventListener('input', debounce(filterProducts));
-    excelFileInput.addEventListener('change', loadExcelFile);
+function displayProducts(productsToDisplay) {
+    if (!productTable) return;
+    productTable.innerHTML = '';
+    productsToDisplay.forEach(product => {
+        const row = document.createElement('tr');
+        row.tabIndex = 0;
+        row.title = 'Haz clic en Agregar para añadir a la lista temporal';
+        const codeCell = document.createElement('td');
+        codeCell.textContent = product.code;
+        const descCell = document.createElement('td');
+        descCell.textContent = product.description;
+        descCell.title = product.description;
+        
+        // Crear celda de precio mejorada para copia fácil
+        const priceCell = document.createElement('td');
+        const priceContainer = document.createElement('div');
+        priceContainer.style.display = 'flex';
+        priceContainer.style.alignItems = 'center';
+        
+        const priceSpan = document.createElement('span');
+        priceSpan.className = 'price-cell';
+        priceSpan.textContent = product.precio_IDI || '0';
+        priceSpan.title = 'Precio IDI';
+        priceSpan.onclick = () => {
+            if (quickCopyEnabled) {
+                copyToClipboard(product.precio_IDI || '0');
+            }
+        };
+        
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'btn btn-outline-primary copy-btn';
+        copyBtn.innerHTML = '📋';
+        copyBtn.title = 'Copiar precio';
+        copyBtn.onclick = (e) => {
+            e.stopPropagation();
+            copyToClipboard(product.precio_IDI || '0');
+        };
+        
+        priceContainer.appendChild(priceSpan);
+        priceContainer.appendChild(copyBtn);
+        priceCell.appendChild(priceContainer);
+        
+        const actionCell = document.createElement('td');
+        const addButton = document.createElement('button');
+        addButton.className = 'btn btn-sm btn-primary';
+        addButton.innerHTML = '<span style="font-size:1.1em;">➕</span> Agregar';
+        addButton.title = 'Agregar a lista temporal';
+        addButton.onclick = () => addToTempList(product);
+        actionCell.appendChild(addButton);
+        row.appendChild(codeCell);
+        row.appendChild(descCell);
+        row.appendChild(priceCell);
+        row.appendChild(actionCell);
+        productTable.appendChild(row);
+    });
+    if (productsToDisplay.length === 0) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 4;
+        cell.innerHTML = '<span style="font-size:1.2em;">😕</span> No se encontraron productos.';
+        cell.style.textAlign = 'center';
+        row.appendChild(cell);
+        productTable.appendChild(row);
+    }
+    
+    // Actualizar tooltips según el estado del switch
+    updatePriceTooltips();
+}
+
+function addToTempList(product) {
+    const existing = selectedProducts.find(p => p.code === product.code);
+    if (!existing) {
+        selectedProducts.push({ ...product, quantity: 1 });
+        updateTempListDisplay();
+        showNotification('Producto agregado a la lista.');
+    } else {
+        showNotification('Ya está en la lista.', 'warning');
+    }
+}
+
+function updateTempListDisplay() {
+    tempListBody.innerHTML = '';
+    selectedProducts.forEach((product, index) => {
+        const row = document.createElement('tr');
+        const codeCell = document.createElement('td');
+        codeCell.textContent = product.code;
+        const descCell = document.createElement('td');
+        descCell.textContent = product.description;
+        const qtyCell = document.createElement('td');
+        const qtyInput = document.createElement('input');
+        qtyInput.type = 'number';
+        qtyInput.min = 1;
+        qtyInput.value = product.quantity;
+        qtyInput.className = 'form-control form-control-sm';
+        qtyInput.style.width = '48px';
+        qtyInput.title = 'Modificar cantidad';
+        qtyInput.onchange = (e) => updateQuantity(index, e.target.value);
+        qtyCell.appendChild(qtyInput);
+        const priceCell = document.createElement('td');
+        priceCell.textContent = product.precio_IDI;
+        const actionCell = document.createElement('td');
+        const removeButton = document.createElement('button');
+        removeButton.className = 'btn btn-sm btn-danger';
+        removeButton.innerHTML = '<span style="font-size:1.1em;">🗑️</span> Eliminar';
+        removeButton.title = 'Eliminar de lista temporal';
+        removeButton.onclick = () => removeFromTempList(index);
+        actionCell.appendChild(removeButton);
+        row.appendChild(codeCell);
+        row.appendChild(descCell);
+        row.appendChild(qtyCell);
+        row.appendChild(priceCell);
+        row.appendChild(actionCell);
+        tempListBody.appendChild(row);
+    });
+}
+
+function updateQuantity(index, newQuantity) {
+    const val = parseInt(newQuantity);
+    if (val >= 1) {
+        selectedProducts[index].quantity = val;
+        showNotification('Cantidad actualizada.');
+    }
+}
+
+function removeFromTempList(index) {
+    selectedProducts.splice(index, 1);
+    updateTempListDisplay();
+    showNotification('Producto eliminado.');
+}
+
+function clearTempList() {
+    if (selectedProducts.length === 0) {
+        showNotification('La lista ya está vacía.', 'warning');
+        return;
+    }
+    selectedProducts = [];
+    updateTempListDisplay();
+    showNotification('Lista temporal vaciada.');
+}
+
+function downloadTempList() {
+    if (selectedProducts.length === 0) {
+        showNotification('La lista temporal está vacía.', 'warning');
+        return;
+    }
+    const workbook = XLSX.utils.book_new();
+    const worksheetData = selectedProducts.map(product => ({
+        'IdClieprov': '20440459588',
+        'IdProducto': product.code,
+        'Idmedida': product.idmedida,
+        'Cantidad': product.quantity,
+        'Precio': product.precio_IDI,
+        'Importe': '',
+        'Precio Mof': '',
+        'Importe Mof': '',
+        'Precio Mex': '',
+        'Importe Mex': '',
+        'IdConsumidor': '',
+        'LoteP': '',
+        'Serie': '',
+        'IdProductoDestino': '',
+        'IdMedida2': '',
+        'Cantidad 2': ''
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pedido');
+    XLSX.writeFile(workbook, 'pedido.xlsx');
+    showNotification('Lista descargada correctamente.');
+}
+
+function debounce(func, delay = 250) {
+    let timeoutId;
+    return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+// Funciones para facilitar la copia de precios
+function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        // Usar la API moderna del portapapeles
+        navigator.clipboard.writeText(text).then(() => {
+            showNotification(`Precio copiado: ${text}`, 'success');
+        }).catch(err => {
+            showNotification('Error al copiar', 'error');
+        });
+    } else {
+        // Fallback para navegadores más antiguos
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showNotification(`Precio copiado: ${text}`, 'success');
+        } catch (err) {
+            showNotification('Error al copiar', 'error');
+        }
+        document.body.removeChild(textArea);
+    }
+}
+
+function filterProducts() {
+    const query = searchQuery.value.trim().toLowerCase();
+    if (!products.length) {
+        searchResults.textContent = 'Primero cargue un archivo Excel.';
+        if (productTable) productTable.innerHTML = '';
+        return;
+    }
+    let filteredProducts;
+    if (query) {
+        filteredProducts = products.filter(product => {
+            const code = String(product.code || '').toLowerCase();
+            const description = String(product.description || '').toLowerCase();
+            return code.includes(query) || description.includes(query);
+        });
+        searchResults.textContent = filteredProducts.length ?
+            `Se encontraron ${filteredProducts.length} productos.` :
+            'No se encontraron productos.';
+    } else {
+        filteredProducts = products.slice(0, 10);
+        searchResults.textContent = `Mostrando los primeros 10 productos. Use la búsqueda para filtrar.`;
+    }
+    displayProducts(filteredProducts);
+}
+
+searchQuery.addEventListener('input', debounce(filterProducts));
+excelFileInput.addEventListener('change', loadExcelFile);
+
+// Event listener para el switch de copia rápida
+document.getElementById('quickCopyToggle').addEventListener('change', function(e) {
+    quickCopyEnabled = e.target.checked;
+    updatePriceTooltips();
+    
+    if (quickCopyEnabled) {
+        showNotification('Copia rápida activada. Haz clic en cualquier precio para copiarlo.', 'success');
+    } else {
+        showNotification('Copia rápida desactivada. Usa el botón 📋 para copiar precios.', 'success');
+    }
+});
+
+// Event listener para el botón de ayuda
+document.getElementById('helpButton').addEventListener('click', function() {
+    showManualVersionMessage();
+});
+
+// Función para actualizar tooltips de precios según el estado del switch
+function updatePriceTooltips() {
+    const priceCells = document.querySelectorAll('.price-cell');
+    priceCells.forEach(cell => {
+        if (quickCopyEnabled) {
+            cell.title = 'Clic para copiar precio';
+            cell.style.cursor = 'pointer';
+        } else {
+            cell.title = 'Precio IDI';
+            cell.style.cursor = 'default';
+        }
+    });
+}
+
+// Fin del código principal
 </script>
 </body>
 </html>
